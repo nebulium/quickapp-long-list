@@ -1,0 +1,102 @@
+<import name="skeleton" src="../Component/skeleton"></import>
+
+<template>
+  <div class="wrapper">
+    <!-- <list class="scroll-page" @scrollbottom="loadMore">
+      <block for="(index, item) in list">
+        <skeleton onemit-list="broadCastScroll" height="{{item.height}}" id="{{index}}" viewport="{{showViewport}}" class="list-item" style="height:{{item.height}}px;"><text>height: {{item.height}}</text></skeleton>
+      </block>
+    </list> -->
+    <div class="scroll-page">
+      <block for="(index, item) in list">
+        <skeleton onemit-list="broadCastScroll" height="{{item.height}}" id="{{index}}" viewport="{{showViewport}}" class="list-item" style="height:{{item.height}}px;"><text>height: {{item.height}}</text></skeleton>
+      </block>
+    </div>
+    <div class="load-more" onappear="loadMore">
+      <text>加载中</text>
+    </div>
+  </div>
+</template>
+
+<script>
+import router from '@system.router'
+import SystemInfo from '../utils/getSystemInfo.js'
+const showNum = 1;
+function throttle(fn, interval) {
+  let last = +new Date(); //first time
+  let timerId = null;
+  return function () {
+    let current = +new Date();
+    let args = [].slice.call(arguments, 0);
+    let context = this;
+    clearTimeout(timerId);
+    if(current - last >= interval) {
+      fn.apply(context, args);
+      last = current;
+    } else {
+      timerId = setTimeout(function() {
+        fn.apply(context, args)
+        last = current
+      }, interval)
+    }
+  }
+}
+export default {
+  // 页面级组件的数据模型，影响传入数据的覆盖机制：private内定义的属性不允许被覆盖
+  private: {
+    list: [],
+    showViewport: null,
+    throttleTimer: null,
+  },
+  async onInit() {
+    let info = await SystemInfo.fetchAllInfo(this);
+    let { windowHeight = 667, screenDensity = 3 } = info.source.system
+    let wHeight = windowHeight / screenDensity * 2;
+    console.log(wHeight)
+    // 相对于viewport上边界的偏移值
+    this.showViewport = {topBottomPos: -(showNum * wHeight), bottomTopPos: (showNum + 1) * wHeight}
+    console.log(this.showViewport.topBottomPos, this.showViewport.bottomTopPos)
+    this.loadMore();
+  },
+  loadMore() {
+   this.list = this.list.concat(this.getList(10))
+  },
+  getList(num) {
+    let list = []
+    for(let i = 0; i < num; i++) {
+      list.push({
+        height: this.getRandomHeight()
+      })
+    }
+    return list;
+  },
+  broadCastScroll: throttle(function() {
+    // console.log(this)
+    this.$broadcast('isScroll');
+  }, 1000),
+  getRandomHeight() {
+    return parseInt(Math.random() * 100 + 200);
+  }
+}
+</script>
+
+<style>
+  .wrapper {
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+  }
+  .scroll-page {
+    layout-type: stagger;
+    flex: 1;
+    width: 100%;
+    flex-direction: column;
+  }
+  .list-item {
+    background-color: coral;
+    border: 1px solid black;
+  }
+  .load-more {
+    width: 100%;
+  }
+</style>

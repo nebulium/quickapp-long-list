@@ -1,0 +1,66 @@
+{
+  "package": "com.application.demo",
+  "name": "quickapp-test",
+  "versionName": "1.0.0",
+  "versionCode": 1,
+  "minPlatformVersion": 1070,
+  "icon": "/Common/logo.png",
+  "deviceTypeList": [
+    "phone"
+  ],
+  "features": [
+    {
+      "name": "system.prompt"
+    },
+    {
+      "name": "system.router"
+    },
+    {
+      "name": "system.shortcut"
+    },
+    {
+      "name": "system.device"
+    },
+    {
+      "name": "system.storage"
+    },
+    {
+      "name": "system.page"
+    }
+  ],
+  "permissions": [
+    {
+      "origin": "*"
+    }
+  ],
+  "config": {
+    "logLevel": "log",
+    "debug": true
+  },
+  "router": {
+    "entry": "Demo",
+    "pages": {
+      "Demo": {
+        "component": "index"
+      }
+    }
+  },
+  "display": {
+    "titleBarBackgroundColor": "#f2f2f2",
+    "titleBarTextColor": "#414141",
+    "pages": {
+      "Demo": {
+        "titleBarText": "示例页",
+        "menu": false
+      }
+    }
+  },
+  "packageInfo": {
+    "originType": "cmd",
+    "toolkit": "1.8.2",
+    "timeStamp": "2020-11-09T15:02:14.546Z",
+    "node": "v12.14.1",
+    "platform": "darwin",
+    "arch": "x64"
+  }
+}

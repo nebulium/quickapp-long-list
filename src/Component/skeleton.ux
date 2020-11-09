@@ -1,0 +1,77 @@
+<template>
+  <div onappear="emitList" class="list-item2" id="list-item-{{skeletonId}}" style="height: {{height}}px">
+    <block if="{{showSlot}}">
+      <slot></slot>
+    </block>
+  </div>
+</template>
+
+<script>
+let showViewport = null;
+export default {
+    props: ['height', 'viewport', 'id'],
+    data() {
+      return {
+        extData: {
+          listItemContainer: null
+        },
+        // height: 0,
+        showSlot: true,
+        skeletonId: ''
+      }
+    },
+    onInit() {
+      this.skeletonId = this.randomString(8); // 设置唯一标识
+      this.$on('isScroll', this.checkViewPort);
+    },
+    async onReady() {
+    },
+    emitList() {
+      this.$emit('emitList')
+    },
+    emitScroll() {
+      console.log('emit scroll')
+    },
+    checkViewPort() {
+      if(!this.viewport) return;
+      let ele = this.$element('list-item-' + this.skeletonId)
+      let { topBottomPos, bottomTopPos } = this.viewport;
+
+      ele.getBoundingClientRect({
+        success: (data) => {
+          const {top, bottom, left, right, width, height} = data;
+          let outOut = !!(top < topBottomPos || bottom > bottomTopPos); // 视窗外
+          if(outOut) {
+            console.log(`[out 要卸载], ${this.skeletonId}，超过预定范围，${top}，${bottom}`)
+            if(!this.showSlot) return;
+            this.showSlot = false;
+          } else {
+            console.log(`[in 要显示], ${this.skeletonId}，在预定范围内，${top}，${bottom}`)
+            if(this.showSlot) return;
+            this.showSlot = true;
+          }
+        },
+        fail: (errorData, errorCode) => {
+            console.log(`错误原因：${JSON.stringify(errorData)}, 错误代码：${errorCode}`)
+        },
+        complete: function () {
+            console.info('complete')
+        }
+      })
+    },
+    randomString(len) {
+      len = len || 32;
+      var $chars = 'abcdefhijkmnprstwxyz2345678'; /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
+      var maxPos = $chars.length;
+      var pwd = '';
+      for (var i = 0; i < len; i++) {
+        pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
+      }
+      return pwd;
+    }
+  }
+</script>
+
+<style scoped>
+.list-item{}
+</style>
